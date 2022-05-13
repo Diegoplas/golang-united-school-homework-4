@@ -2,9 +2,10 @@ package string_sum
 
 import (
 	"errors"
+	"strconv"
+	"strings"
 )
 
-//use these errors as appropriate, wrapping them with fmt.Errorf function
 var (
 	// Use when the input is empty, and input is considered empty if the string contains only whitespace
 	errorEmptyInput = errors.New("input is empty")
@@ -21,7 +22,92 @@ var (
 // with fmt.Errorf function
 //
 // Use the errors defined above as described, again wrapping into fmt.Errorf
+const (
+	ASCIIPlus  = 43
+	ASCIIMinus = 45
+	ASCIIZero  = 48
+	ASCIINine  = 57
+)
 
 func StringSum(input string) (output string, err error) {
-	return "", nil
+	firstNumber := ""
+	secondNumber := ""
+	input = strings.ReplaceAll(input, " ", "")
+	if input == "" {
+		return "", errorEmptyInput
+	}
+	lastCharInput := len(input) - 1
+	for idx := lastCharInput; idx >= 0; idx-- {
+		if input[idx] == ASCIIMinus || input[idx] == ASCIIPlus {
+			secondNumber = input[idx:]
+			firstNumber = input[:idx]
+			break
+		}
+	}
+	err = validateOnlyValidCharacters(firstNumber)
+	if err != nil {
+		return "", err
+	}
+	err = validateOnlyValidCharacters(secondNumber)
+	if err != nil {
+		return "", err
+	}
+	err = validateFirstNumber(firstNumber)
+	if err != nil {
+		return "", err
+	}
+	err = validateFirstNumber(firstNumber)
+	if err != nil {
+		return "", err
+	}
+	total, err := sumStrings(firstNumber, secondNumber)
+	if err != nil {
+		return "", err
+	}
+	return total, nil
+}
+
+func validateFirstNumber(number string) error {
+	signCounter := 0
+	if number[0] != ASCIIPlus && number[0] != ASCIIMinus {
+		signCounter += 1
+	}
+	for idx := range number {
+		if number[idx] == ASCIIPlus || number[idx] == ASCIIMinus {
+			signCounter += 1
+		}
+		if signCounter > 1 {
+			return errorNotTwoOperands
+		}
+	}
+	return nil
+}
+
+func validateCharacter(char byte) bool {
+	if (char >= ASCIIZero && char <= ASCIINine) || char == ASCIIPlus || char == ASCIIMinus {
+		return true
+	}
+	return false
+}
+
+func validateOnlyValidCharacters(number string) error {
+	for idx := range number {
+		if !validateCharacter(number[idx]) {
+			return errorNotTwoOperands
+		}
+	}
+	return nil
+}
+
+func sumStrings(firstNumber, secondNumber string) (string, error) {
+	firstNumInt, err := strconv.Atoi(firstNumber)
+	if err != nil {
+		return "", errorNotTwoOperands
+	}
+	secondNumInt, err := strconv.Atoi(secondNumber)
+	if err != nil {
+		return "", errorNotTwoOperands
+	}
+	total := strconv.Itoa(firstNumInt + secondNumInt)
+	return total, nil
 }
