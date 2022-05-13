@@ -36,6 +36,16 @@ func StringSum(input string) (output string, err error) {
 	if input == "" {
 		return "", errorEmptyInput
 	}
+
+	err = validateOnlyValidCharacters(input)
+	if err != nil {
+		return "", err
+	}
+	err = validateOnlyTwoNums(input)
+	if err != nil {
+		return "", err
+	}
+
 	lastCharInput := len(input) - 1
 	for idx := lastCharInput; idx >= 0; idx-- {
 		if input[idx] == ASCIIMinus || input[idx] == ASCIIPlus {
@@ -44,22 +54,7 @@ func StringSum(input string) (output string, err error) {
 			break
 		}
 	}
-	err = validateOnlyValidCharacters(firstNumber)
-	if err != nil {
-		return "", err
-	}
-	err = validateOnlyValidCharacters(secondNumber)
-	if err != nil {
-		return "", err
-	}
-	err = validateFirstNumber(firstNumber)
-	if err != nil {
-		return "", err
-	}
-	err = validateFirstNumber(firstNumber)
-	if err != nil {
-		return "", err
-	}
+
 	total, err := sumStrings(firstNumber, secondNumber)
 	if err != nil {
 		return "", err
@@ -67,19 +62,23 @@ func StringSum(input string) (output string, err error) {
 	return total, nil
 }
 
-func validateFirstNumber(number string) error {
+func validateOnlyTwoNums(input string) error {
 	signCounter := 0
-	if number[0] != ASCIIPlus && number[0] != ASCIIMinus {
+	if input[0] != ASCIIPlus && input[0] != ASCIIMinus {
 		signCounter += 1
 	}
-	for idx := range number {
-		if number[idx] == ASCIIPlus || number[idx] == ASCIIMinus {
+	for idx := range input {
+		if input[idx] == ASCIIPlus || input[idx] == ASCIIMinus {
 			signCounter += 1
 		}
-		if signCounter > 1 {
+		if signCounter > 2 {
 			return errorNotTwoOperands
 		}
 	}
+	if signCounter == 1 {
+		return errorNotTwoOperands
+	}
+
 	return nil
 }
 
